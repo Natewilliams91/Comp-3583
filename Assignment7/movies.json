@@ -1,0 +1,62 @@
+[
+  {
+  "title": "The Matrix",
+  "genre": "Sci-Fi",
+  "director": "Lana Wachowski",
+  "year": 1999
+  },
+  {
+  "title": "The Dark Knight",
+  "genre": "Action",
+  "director": "Christopher Nolan",
+  "year": 2008
+  },
+  {
+  "title": "Inception",
+  "genre": "Sci-Fi",
+  "director": "Christopher Nolan",
+  "year": 2010
+  },
+  {
+  "title": "The Shawshank Redemption",
+  "genre": "Drama",
+  "director": "Frank Darabont",
+  "year": 1994
+  },
+  {
+  "title": "Pulp Fiction",
+  "genre": "Crime",
+  "director": "Quentin Tarantino",
+  "year": 1994
+  },
+  {
+  "title": "The Godfather",
+  "genre": "Crime",
+  "director": "Francis Ford Coppola",
+  "year": 1972
+  },
+  {
+  "title": "The Lord of the Rings: The Fellowship of the Ring",
+  "genre": "Fantasy",
+  "director": "Peter Jackson",
+  "year": 2001
+  },
+  {
+  "title": "Forrest Gump",
+  "genre": "Drama",
+  "director": "Robert Zemeckis",
+  "year": 1994
+  },
+  {
+  "title": "Star Wars: Episode IV - A New Hope",
+  "genre": "Sci-Fi",
+  "director": "George Lucas",
+  "year": 1977
+  },
+  {
+  "title": "The Silence of the Lambs",
+  "genre": "Thriller",
+  "director": "Jonathan Demme",
+  "year": 1991
+  }
+  ]
