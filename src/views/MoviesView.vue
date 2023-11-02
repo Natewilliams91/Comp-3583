@@ -23,7 +23,7 @@
                 <button @click="addTask(day)">Add Task</button>
               </div>
               <ul v-if="day !== '' && tasks[day] && tasks[day].length > 0" class="task-list">
-                <li v-for="(task, index) in tasks[day]" :key="index">
+                <li v-for="(task, index) in tasks[day]" :key="index" class="task-item">
                   {{ task }}
                   <button @click="removeTask(day, index)">Remove</button>
                 </li>
@@ -182,5 +182,16 @@ export default {
     background-color: #f5f5f5;
     border: none;
     cursor: pointer;
+  }
+  .task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add an ellipsis when text overflows */
   }
 </style>
