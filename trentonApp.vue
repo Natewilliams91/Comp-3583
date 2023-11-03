@@ -1,4 +1,4 @@
-<template> <!--HTML portion-->
+<template> 
 
   <main class="taskTracker"> 
 
@@ -6,7 +6,7 @@
 
       <h2 class="title">
         
-        Hello, <input type="text" id="name" placeholder="Your Name" v-model="userName">
+        Hello, Welcome to your Task Tracker, <input type="text" id="name" placeholder="Your Name" v-model="userName"> 
 
       </h2>
 
@@ -84,13 +84,13 @@
 
               id="cat3"
 
-              value="personal"
+              value="fitness"
 
               v-model="selectedCategory"
             />
-            <span class="taskCatIcon personal"></span>
+            <span class="taskCatIcon fitness"></span>
 
-            <div>Personal</div>
+            <div>Fitness</div>
 
           </label>
 
@@ -124,41 +124,48 @@
 
     <section class="task-list">
 
-      <h3>Your current tasks:</h3>
+  <h2>Your current tasks:</h2>
 
-      <div class="list" id="task-list">
+  <div class="list" id="task-list">
 
-        <div v-for="task in sortedTaskList" :key="task.timeCreated" :class="`task-item ${task.done && 'done'} ${task.category}`">
+    <template v-for="(task, index) in sortedTaskList" :key="task.timeCreated">
 
-          <label>
+      <!-- Checking if the category is different from the last task -->
+      <template v-if="index === 0 || task.category !== sortedTaskList[index - 1].category">
 
-            <input type="checkbox" v-model="task.done" />
+        <h4>{{ task.category }}</h4>
 
-            <span :class="`taskCatIcon ${
-              
-              categoryClassMapping[task.category] || 'default'}`">
-              
-            </span>
-            
-          </label>
+      </template>
 
-          <div class="task-content">
+      <div :class="`task-item ${task.done && 'done'} ${task.category}`">
+        
+        <label>
 
-            <input type="text" v-model="task.content" />
+          <input type="checkbox" v-model="task.done" />
 
-          </div>
+          <span :class="`taskCatIcon ${categoryClassMapping[task.category] || 'default'}`"></span>
 
-          <div class="actions">
+        </label>
 
-            <button class="delete" @click="removeTask(task)">Delete</button>
+        <div class="task-content">
 
-          </div>
+          <input type="text" v-model="task.content" />
+
+        </div>
+
+        <div class="actions">
+
+          <button class="delete" @click="removeTask(task)">Delete</button>
 
         </div>
 
       </div>
 
-    </section>
+    </template>
+
+  </div>
+
+</section>
 
   </main>
 
@@ -175,7 +182,7 @@ const categoryClassMapping =
 {
 
   work: 'work',
-  personal: 'personal',
+  fitness: 'fitness',
   school: 'school', 
   other: 'other',   
   
@@ -221,7 +228,7 @@ const sortedTaskList = computed(() => {
     const categoryOrder = {
       work: 1,
       school: 2,
-      personal: 3,
+      fitness: 3,
       other: 4,
     };
 
@@ -238,8 +245,6 @@ const sortedTaskList = computed(() => {
     }
   });
 });
-
-
 
 // Retrieve the user's name and task list from local storage
 onMounted(() => {
@@ -275,14 +280,12 @@ const categoryList = computed(() => {
 
 <style> 
 
-:root {
-  --primary: #EA40A4;
-  --work: #b0ccf5;
-  --school: rgb(248, 151, 151); /* Change to your school color */
-  --personal: rgb(169, 239, 169); /* Change to your personal color */
-  --other: rgb(200, 154, 232); /* Change to your other color */
-  --grey: #888;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+body 
+{
+
+	background: rgb(241, 241, 241);
+	color: rgb(34, 29, 29);
+
 }
 
 * 
@@ -291,14 +294,6 @@ const categoryList = computed(() => {
 	padding: 0;
 	box-sizing: border-box;
 	font-family: 'montserrat', sans-serif;
-}
-
-body 
-{
-
-	background: rgb(241, 241, 241);
-	color: rgb(34, 29, 29);
-
 }
 
 section 
@@ -319,7 +314,7 @@ h3
 
 h4 
 {
-	color: var(--grey);
+	color: rgb(113, 113, 113);
 	font-size: 0.875rem;
 	font-weight: 700;
 	margin-bottom: 0.5rem;
@@ -364,7 +359,7 @@ input:not([type="radio"]):not([type="checkbox"]), button
 	color: rgb(34, 29, 29);
 	background-color: #FFF;
 	border-radius: 0.5rem;
-	box-shadow: var(--shadow);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	margin-bottom: 1.5rem;
 }
 
@@ -383,7 +378,7 @@ input:not([type="radio"]):not([type="checkbox"]), button
 	padding: 1.5rem;
 	background-color: #FFF;
 	border-radius: 0.5rem;
-	box-shadow: var(--shadow);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	cursor: pointer;
 }
 
@@ -404,8 +399,8 @@ input[type="checkbox"]
 	justify-content: center;
 	width: 20px;
 	height: 20px;
-  border: 2px solid var(--work);
-	box-shadow: 0px 0px 3px rgba(73, 127, 210, 0.8);;
+  border: 2px solid rgb(73, 127, 210);
+	box-shadow: 0px 0px 3px rgba(73, 127, 210, 0.8);
 	border-radius: 50%;
 	
 }
@@ -416,7 +411,7 @@ input[type="checkbox"]
 	box-shadow: 0px 0px 3px rgba(194, 72, 72, 0.75);
 }
 
-.taskCatIcon.personal 
+.taskCatIcon.fitness 
 {
 	border-color: var(white);
 	box-shadow: 0px 0px 3px rgba(64, 218, 103, 0.75);
@@ -435,8 +430,8 @@ input[type="checkbox"]
 	opacity: 0;
 	width: 0px;
 	height: 0px;
-	background-color: var(--work);
-	box-shadow: var(--work-glow);
+	background-color: rgb(73, 127, 210);
+	box-shadow: rgb(175, 217, 252);
 	border-radius: 50%;
 	transition: 0.2s ease-in-out;
 }
@@ -446,7 +441,7 @@ input[type="checkbox"]
 	box-shadow: 0px 0px 3px rgba(194, 72, 72, 0.75);
 }
 
-.taskCatIcon.personal::after {
+.taskCatIcon.fitness::after {
 	background-color: rgb(100, 233, 100);
 	box-shadow: 0px 0px 3px rgba(64, 218, 103, 0.75);
 }
@@ -499,7 +494,7 @@ input:checked ~ .taskCatIcon::after {
 	background-color: #FFF;
 	padding: 1rem;
 	border-radius: 0.5rem;
-	box-shadow: var(--shadow);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	margin-bottom: 1rem;
 }
 
@@ -545,7 +540,7 @@ input:checked ~ .taskCatIcon::after {
 .task-item .actions .edit 
 {
 	margin-right: 0.5rem;
-	background-color: var(--primary);
+	background-color: rgb(28, 187, 240);
 }
 
 .task-item .actions .delete 
@@ -556,23 +551,23 @@ input:checked ~ .taskCatIcon::after {
 .task-item.done .task-content input 
 {
 	text-decoration: line-through;
-	color: var(--grey);
+	color: rgb(113, 113, 113);
 }
 
 .task-item.work {
-  background-color: var(--work);
+  background-color: rgb(175, 217, 252);
 }
 
 .task-item.school {
-  background-color: var(--school);
+  background-color: rgb(248, 151, 151);
 }
 
-.task-item.personal {
-  background-color: var(--personal);
+.task-item.fitness {
+  background-color:  rgb(169, 239, 169);
 }
 
 .task-item.other {
-  background-color: var(--other);
+  background-color: rgb(200, 154, 232);
 }
 
 .task-list .task-item {
@@ -580,10 +575,8 @@ input:checked ~ .taskCatIcon::after {
   align-items: center;
   padding: 1rem;
   border-radius: 0.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
 }
 
-
 </style>
-
