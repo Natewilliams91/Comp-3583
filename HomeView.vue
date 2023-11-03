@@ -1,15 +1,549 @@
-<template>
-  <div class="home">
-    <h1>Welcome</h1>
-  </div>
+<template> <!--HTML portion-->
+
+  <main class="taskTracker"> 
+
+    <section class="welcome">
+
+      <h2 class="title">
+
+        Hello, <input type="text" id="name" placeholder="Your Name" v-model="userName">
+
+      </h2>
+
+    </section>
+
+    <section class="createTask">
+
+      <h4>Select a color for your category:</h4>
+<select v-model="selectedCategoryColor">
+    <option v-for="category in categoryList" :key="category" :value="categoryColors[category]">{{ category }}</option>
+</select>
+
+
+      <h3>Create a new task:</h3>
+
+      <br> 
+
+      <form id="taskForm" @submit.prevent="addTask">
+
+        <input
+          type="text"
+
+          name="content"
+
+          id="content"
+
+          placeholder="ex: study for test"
+
+          v-model="newTaskContent"
+        />
+
+        <h4>Select a category for your task:</h4>
+
+        <div class="taskOptions">
+          <label>
+
+            <input
+
+              type="radio"
+
+              name="category"
+
+              id="cat1"
+
+              value="work"
+
+              v-model="selectedCategory"
+            />
+            <span class="taskCatIcon work"></span>
+
+            <div>Work</div>
+
+          </label>
+
+          <label>
+
+            <input
+
+              type="radio"
+
+              name="category"
+
+              id="cat2"
+
+              value="school"
+
+              v-model="selectedCategory"
+            />
+            <span class="taskCatIcon school"></span>
+
+            <div>School</div>
+
+            </label>
+
+          <label>
+
+            <input
+              type="radio"
+
+              name="category"
+
+              id="cat3"
+
+              value="personal"
+
+              v-model="selectedCategory"
+            />
+            <span class="taskCatIcon personal"></span>
+
+            <div>Personal</div>
+
+          </label>
+
+          <label>
+
+          <input
+
+            type="radio"
+
+            name="category"
+
+            id="cat4"
+
+            value="other"
+
+            v-model="selectedCategory"
+          />
+          <span class="taskCatIcon other"></span>
+
+          <div>Other</div>
+
+          </label>
+
+        </div>
+
+        <input type="submit" value="Add Task" />
+
+      </form>
+
+    </section>
+
+    <section class="task-list">
+
+      <h3>Your current tasks:</h3>
+
+      <div class="list" id="task-list">
+
+        <div v-for="task in sortedTaskList" :key="task.timeCreated" :class="`task-item ${task.done && 'done'} ${task.category}`">
+
+          <label>
+
+            <input type="checkbox" v-model="task.done" />
+
+            <span :class="`taskCatIcon ${
+              
+              categoryClassMapping[task.category] || 'default'}`">
+
+            </span>
+
+          </label>
+
+          <div class="task-content">
+
+            <input type="text" v-model="task.content" />
+
+          </div>
+
+          <div class="actions">
+
+            <button class="delete" @click="removeTask(task)">Delete</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
 </template>
 
-<script>
-// @ is an alias to /src
+<script setup> //Javascript portion
 
-export default {
-  name: 'HomeView',
-  components: {
+
+import {computed} from 'vue'
+import {onMounted} from 'vue'
+import {ref} from 'vue'
+import {watch} from 'vue'
+
+const selectedCategoryColor = ref('');
+
+const categoryColors = {
+  work: '--work',
+  personal: '--personal',
+  school: '--school',
+  other: '--other',
+};
+
+const categoryList = computed(() => {
+  return [...new Set(taskList.value.map((task) => task.category))];
+});
+
+
+const categoryClassMapping = 
+{
+  work: 'work',
+  personal: 'personal',
+  school: 'school', 
+  other: 'other',   
+  
+};
+// empty array to store the tasks
+const taskList = ref([])
+// variable to store the user's name
+const userName = ref('')
+// variable that stores contents of a task
+const newTaskContent = ref('')
+//Variable to store the category of the task
+const selectedCategory = ref(null)
+const addTask = () => {
+  if (newTaskContent.value.trim() === '' || selectedCategory.value === null) {
+    return; // Ensure a task can't be created without inputting values
   }
+  taskList.value.push({
+    content: newTaskContent.value,
+    category: selectedCategory.value,
+    categoryColor: selectedCategoryColor.value,
+    done: false,
+    editable: false,
+    timeCreated: new Date().getTime()
+  });
+  selectedCategoryColor.value = ''; // Reset the color after adding the task
+};
+
+  taskList.value.push({
+    content: newTaskContent.value,
+    category: selectedCategory.value,
+    done: false,
+    editable: false,
+    timeCreated: new Date().getTime()
+  })
+
+// Remove a task from the list
+const removeTask = (task) => {
+  taskList.value = taskList.value.filter((t) => t !== task)
 }
+// sorting the tasks based on when they were created
+const sortedTaskList = computed(() => {
+  return taskList.value.slice().sort((a, b) => {
+    // Assign numeric values to categories to establish a sorting order
+    const categoryOrder = {
+      work: 1,
+      school: 2,
+      personal: 3,
+      other: 4,
+    };
+    const categoryA = categoryOrder[a.category];
+    const categoryB = categoryOrder[b.category];
+    if (categoryA < categoryB) {
+      return -1;
+    } else if (categoryA > categoryB) {
+      return 1;
+    } else {
+      // If categories are the same, sort by timeCreated
+      return a.timeCreated - b.timeCreated;
+    }
+  });
+});
+// Retrieve the user's name and task list from local storage
+onMounted(() => {
+userName.value = localStorage.getItem('userName') || ''
+taskList.value = JSON.parse(localStorage.getItem('taskList')) || []
+})
+// watching for changes in the username and saving the name locally to remember it
+watch(userName, (newVal) => {
+  
+  localStorage.setItem('userName', newVal)
+})
+// watching for changes in the task list and saving it to local storage to remember tasks
+watch(taskList, (newVal) => {
+  localStorage.setItem('taskList', JSON.stringify(newVal))
+  
+}, {
+  deep: true
+})
+
 </script>
+
+<style> 
+:root {
+  --primary: #EA40A4;
+  --work: #b0ccf5;
+  --school: rgb(248, 151, 151); /* Change to your school color */
+  --personal: rgb(169, 239, 169); /* Change to your personal color */
+  --other: rgb(200, 154, 232); /* Change to your other color */
+  --grey: #888;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+* 
+{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'montserrat', sans-serif;
+}
+body 
+{
+	background: rgb(241, 241, 241);
+	color: rgb(34, 29, 29);
+}
+section 
+{
+	margin-top: 1cm;
+	margin-bottom: 1cm;
+	padding-left: 0.75cm;
+	padding-right: 0.75cm;
+}
+h3 
+{
+	color: rgb(34, 29, 29);
+	font-size: 1rem;
+	font-weight: 400;
+	margin-bottom: 0.5rem;
+}
+h4 
+{
+	color: var(--grey);
+	font-size: 0.875rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+}
+input:not([type="radio"]):not([type="checkbox"]), button 
+{
+	appearance: none;
+	border: none;
+	outline: none;
+	background: none;
+	cursor: initial;
+}
+.welcome .title 
+{
+	display: flex;
+}
+.welcome .title input 
+{
+	margin-left: 0.5rem;
+	flex: 1 1 0%;
+	min-width: 0;
+}
+.welcome .title,
+.welcome .title input 
+{
+	color: rgb(34, 29, 29);
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+.createTask input[type="text"] 
+{
+	display: block;
+	width: 100%;
+	font-size: 16px;
+	padding: 1rem 1.5rem;
+	color: rgb(34, 29, 29);
+	background-color: #FFF;
+	border-radius: 0.5rem;
+	box-shadow: var(--shadow);
+	margin-bottom: 1.5rem;
+}
+.createTask .taskOptions {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+.createTask .taskOptions label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	background-color: #FFF;
+	border-radius: 0.5rem;
+	box-shadow: var(--shadow);
+	cursor: pointer;
+}
+input[type="radio"]
+{
+	display: none;
+}
+input[type="checkbox"] 
+{
+	display: none;
+}
+.taskCatIcon
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+  border: 2px solid var(--work);
+	box-shadow: 0px 0px 3px rgba(73, 127, 210, 0.8);;
+	border-radius: 50%;
+	
+}
+.taskCatIcon.school 
+{
+	border-color: var(white);
+	box-shadow: 0px 0px 3px rgba(194, 72, 72, 0.75);
+}
+.taskCatIcon.personal 
+{
+	border-color: var(white);
+	box-shadow: 0px 0px 3px rgba(64, 218, 103, 0.75);
+}
+.taskCatIcon.other 
+{
+	border-color: var(white);
+	box-shadow: 0px 0px 3px rgba(127, 56, 185, 0.75);
+}
+.taskCatIcon::after 
+{
+	content: "";
+	display: block;
+	opacity: 0;
+	width: 0px;
+	height: 0px;
+	background-color: var(--work);
+	box-shadow: var(--work-glow);
+	border-radius: 50%;
+	transition: 0.2s ease-in-out;
+}
+.taskCatIcon.school::after {
+	background-color: rgb(232, 63, 63);
+	box-shadow: 0px 0px 3px rgba(194, 72, 72, 0.75);
+}
+.taskCatIcon.personal::after {
+	background-color: rgb(100, 233, 100);
+	box-shadow: 0px 0px 3px rgba(64, 218, 103, 0.75);
+}
+.taskCatIcon.other::after {
+	background-color: rgb(151, 38, 226);
+	box-shadow: 0px 0px 3px rgba(127, 56, 185, 0.75);
+}
+input:checked ~ .taskCatIcon::after {
+	width: 10px;
+	height: 10px;
+	opacity: 1;
+}
+.createTask .taskOptions label div {
+	color: rgb(34, 29, 29);
+	font-size: 1.125rem;
+	margin-top: 1rem;
+}
+.createTask input[type="submit"] 
+{
+	display: block;
+	width: 100%;
+	font-size: 1.125rem;
+	padding: 1rem 1.5rem;
+	color: #FFF;
+	background-color: rgb(28, 187, 240);
+	border-radius: 0.5rem;
+	box-shadow: 0px 0px 4px rgb(85, 213, 255);
+	cursor: pointer;
+	transition: 0.2s ease-in-out;
+}
+.createTask input[type="submit"]:hover 
+{
+	opacity: 0.75;
+}
+.task-list .list 
+{
+	margin: 1rem 0;
+} 
+.task-list .task-item 
+{
+	display: flex;
+	align-items: center;
+	background-color: #FFF;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	box-shadow: var(--shadow);
+	margin-bottom: 1rem;
+}
+.task-item label 
+{
+	display: block;
+	margin-right: 1rem;
+	cursor: pointer;
+}
+.task-item .task-content 
+{
+	flex: 1 1 0%;
+}
+.task-item .task-content input 
+{
+	color: rgb(34, 29, 29);
+	font-size: 1.125rem;
+}
+.task-item .actions 
+{
+	display: flex;
+	align-items: center;
+}
+.task-item .actions button 
+{
+	display: block;
+	padding: 0.5rem;
+	border-radius: 0.25rem;
+	color: #FFF;
+	cursor: pointer;
+	transition: 0.2s ease-in-out;
+}
+.task-item .actions button:hover 
+{
+	opacity: 0.75;
+}
+.task-item .actions .edit 
+{
+	margin-right: 0.5rem;
+	background-color: var(--primary);
+}
+.task-item .actions .delete 
+{
+	background-color: rgb(227, 69, 69);
+}
+.task-item.done .task-content input 
+{
+	text-decoration: line-through;
+	color: var(--grey);
+}
+.task-item.work {
+  background-color: var(--work);
+}
+.task-item.school {
+  background-color: var(--school);
+}
+.task-item.personal {
+  background-color: var(--personal);
+}
+.task-item.other {
+  background-color: var(--other);
+}
+.task-list .task-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+.task-item {
+  background-color: var(var(--categoryColor));
+}
+
+</style>

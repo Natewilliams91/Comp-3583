@@ -3,38 +3,41 @@
     <h1>My Progress</h1>
     
     <!-- Task Addition -->
-    <div>
-      <input v-model="newTask" @keyup.enter="addTask" placeholder="Add a new task">
-      <select v-model="selectedCategory">
+    <div class="add-section">
+      <input class="task-input" v-model="newTask" @keyup.enter="addTask" placeholder="Add a new task">
+      <select class="category-dropdown" v-model="selectedCategory">
+        <option disabled value="">Select a category</option>
         <option v-for="category in categories" :key="category">{{ category }}</option>
       </select>
-      <button @click="addTask">Add Task</button>
+      <button class="add-btn" @click="addTask">Add Task</button>
     </div>
     
     <!-- Category Addition -->
     <div class="category-section">
-      <input v-model="newCategory" placeholder="New category name">
-      <input v-model="insertPosition" type="number" placeholder="Insert position (0 for top)">
-      <button @click="addCategory">Create Category</button>
+      <input class="category-input" v-model="newCategory" placeholder="New category name">
+      <button class="create-btn" @click="addCategory">Create Category</button>
     </div>
     
     <!-- Tasks and Categories Display -->
-    <ul>
+    <ul class="task-list">
       <li v-for="(task, index) in tasks" :key="index">
         <template v-if="task.isCategoryHeader">
           <h3>{{ task.category }}</h3>
         </template>
-        <span v-if="!task.isCategoryHeader">{{ task.text }}</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          v-if="!task.isCategoryHeader"
-          v-model="task.progress"
-          :style="getProgressBarColor(task.progress)"
-        >
-        <span v-if="!task.isCategoryHeader">{{ task.progress }}%</span>
-        <button @click="removeTask(index)">Remove</button>
+        <div v-if="!task.isCategoryHeader" class="task-item">
+          <span>{{ task.text }}</span>
+          <div class="progress-container">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              v-model="task.progress"
+              :style="getProgressBarColor(task.progress)"
+            >
+            <span>{{ task.progress }}%</span>
+            <button class="remove-btn" @click="removeTask(index)">Remove</button>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -89,83 +92,92 @@ export default {
 </script>
 
 <style scoped>
+/* Global Styles */
 .myprogress {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
-.category-section {
-  margin-top: 20px;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
+.add-section, .category-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-ul {
+.task-input, .category-input {
+  flex: 2;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.category-dropdown {
+  flex: 1;
+  margin-right: 10px;
+}
+
+/* Buttons */
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.create-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.remove-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Task List */
+.task-list {
   list-style: none;
   padding: 0;
 }
 
-li {
+.task-item {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 0;
 }
 
-h3 {
-  width: 100%;
-  margin-top: 10px;
-  font-weight: bold;
+.progress-container {
+  display: flex;
+  align-items: center;
 }
 
 input[type="range"] {
   width: 60%;
-  height: 10px;
-  appearance: none;
-  background: transparent;
-  outline: none;
-  opacity: 0.7;
-  transition: background 0.2s;
+  margin-right: 10px;
 }
 
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 15px;
-  height: 15px;
-  background-color: transparent;
-  border: 1px solid #000;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s;
+h1 {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
 }
 
-button {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
+h3 {
+  width: 100%;
+  margin: 15px 0;
+  font-weight: bold;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 5px;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
